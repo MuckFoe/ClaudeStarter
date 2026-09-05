@@ -4,6 +4,11 @@ Input documents live in `input/`. They may be anything the user has: a spec, a
 style guide, architecture notes, meeting minutes, a standards document, an old
 README, a domain description, screenshots of a legacy system.
 
+Run by the `input-analyst` subagent (Phase 1), which executes this protocol in
+its own context and writes `input/_analysis.md`. The main session reads the
+analysis, not the raw documents — that is what keeps context free for the
+interview the analysis exists to drive.
+
 Your job is to build the project's frame from what these documents **actually
 say** — and to be visibly, verifiably silent about everything they do not.
 

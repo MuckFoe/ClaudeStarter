@@ -111,6 +111,30 @@ still in control" gets made concrete.
 - Scope discipline: is it allowed to fix unrelated things it notices, or should
   it flag them and leave them alone?
 
+## `agent-tooling` — what the agent reaches for
+
+Policy about the agent's own tools. Distinct from `agent-conduct`, which is
+about what it may *do*; this is about what it may *use*, and it feeds Phase 8
+directly — every rule here becomes something to configure or deliberately not
+configure.
+
+- What proves the project works, as one command? (If `verification` has not
+  already settled this, settle it here — everything else is downstream of it.)
+- Which external services does this project touch, and is there a CLI for each?
+  Name the auth prerequisite: a CLI the agent cannot authenticate is not a tool.
+- May the agent add an MCP server, or is that a decision the user makes? An MCP
+  server is a dependency and a trust boundary, not a convenience.
+- When must work be delegated to a subagent rather than done inline? Answers
+  worth having name a threshold — a file count, a whole-repo survey, a review
+  that should not be done by whoever wrote the code.
+- What may run without asking, what must be confirmed, what is denied outright
+  even when the agent is convinced it should proceed? The last list is the only
+  one that survives the agent being talked into something.
+- Which checks must be deterministic — a hook or CI — rather than trusted to
+  the agent? Each answer is enforcement to build, and an answer with nothing
+  behind it is a tier that is currently a lie.
+
+
 ---
 
 ## Domains to propose sparingly

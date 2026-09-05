@@ -1,7 +1,8 @@
 # File templates
 
-Exact shapes to write in Phase 4. Adapt wording to the project; keep the
-structure and the two rules below, which are what make the output reusable.
+Exact shapes for the files this skill writes (Phases 3, 5 and 7). Adapt wording
+to the project; keep the structure and the two rules below, which are what make
+the output reusable.
 
 ---
 
@@ -95,6 +96,10 @@ binding, naming the rule id so the connection is explicit.>
 ## Open
 See `rules/_progress.md` for follow-ups and findings, `rules/_decisions.md`
 for settled questions.
+
+## Context
+When compacting, preserve: the requirement id in progress, the files modified
+this session, and the exact verification command with its last result.
 ```
 
 **Do not use `@path` import syntax for domain rules.** Imports load eagerly at
@@ -137,7 +142,8 @@ reason is a principle.
 rule is accepted they are cost with no reader. They stay in the elicitation
 transcript.
 
-Numbered ids (`VER3`, `SEC1`) exist so rules can be cited in review and in
+Numbered ids formed from the domain (`VER3` in verification, `SEC1` in security)
+exist so rules can be cited in review and in
 commit messages — "violates VER3" is a complete review comment. Do not renumber
 on edit; retire an id rather than reusing it.
 
@@ -151,7 +157,7 @@ Written in Phase 4, before any rule is proposed. Full protocol in
 ```markdown
 # Requirements
 
-Every change is driven by a requirement, and its commit names it (GIT1). A
+Every change is driven by a requirement, and its commit names it. A
 requirement may be a single sentence — the bar is that it exists, was written
 first, and has exactly one reading.
 
@@ -169,6 +175,43 @@ design.>
 
 **Out of scope** for the project as a whole gets its own section at the end and
 is confirmed explicitly. Unstated scope boundaries are where projects grow.
+
+---
+
+## `docs/concepts.md`
+
+Written during Phase 3 and added to whenever a term is settled. Phase 4's
+clarity bar depends on it: a requirement whose terms are undefined is itself
+undefined, however carefully the requirement is worded.
+
+```markdown
+# Concepts
+
+Domain vocabulary as the user defined it. A term here means what this project
+means by it, which is not always what the wider field means by it.
+
+Terms marked **undefined** are undefined on purpose. Do not supply a plausible
+meaning — that is the inference this kit exists to prevent.
+
+## <Term>
+<The definition, in the user's words where possible.>
+
+**Source:** <citation from input/, or "user, <date>">
+**Related:** <other terms, where the relationship was stated rather than assumed>
+
+## <Term> — undefined
+Appears in <where>, never defined. <What is known about its use, if anything.>
+
+**Blocking:** <requirement ids or rules that cannot be written until this settles>
+```
+
+One heading per term, and keep the file flat. A glossary that grows
+sub-sections stops being scannable, and a glossary nobody scans is one where
+terms quietly acquire a second meaning.
+
+**Record the undefined terms too.** An empty glossary and a glossary saying
+"these four terms were never defined" look equally short, and only one of them
+tells the next session where the ground is soft.
 
 ---
 

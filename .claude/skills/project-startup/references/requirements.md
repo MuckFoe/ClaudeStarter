@@ -2,7 +2,7 @@
 
 Runs after the business background is settled with the user, and before any
 rules are proposed. Rules govern *how* work is done; requirements say *what*
-is to be built. Without them, GIT1's traceability has nothing to point at.
+is to be built. Without them, commit traceability has nothing to point at.
 
 Inputs: `input/_analysis.md`, and the user's answers to its Questions section.
 Output: `REQUIREMENTS.md`.
@@ -17,7 +17,7 @@ Not clear enough to start on. Every requirement is checked against all five:
 1. **Done is decidable.** There is a stated condition under which this is
    finished, and it can be evaluated without asking anyone.
 2. **Every term is defined.** Each domain term appearing in it is defined in
-   the concepts document or the analysis. A requirement resting on an undefined
+   `docs/concepts.md` or the analysis. A requirement resting on an undefined
    term is undefined.
 3. **One reading.** You cannot construct a second defensible interpretation.
 4. **The boundary is stated.** What this does *not* cover is written down.
@@ -80,7 +80,7 @@ re-enters.
 **Status:** open | in progress | done | dropped
 ```
 
-Ids are stable and never reused. Commits reference them (GIT1).
+Ids are stable and never reused, so commits and reviews can cite them.
 
 **Sizing.** A requirement is a unit of work that can be completed and verified
 as a whole. If it cannot be finished in one go it is several requirements; if
@@ -90,7 +90,7 @@ here.
 **A requirement states an outcome, not a design.** "Users can export a match
 report as PDF" is a requirement. "Add a `POST /api/report` endpoint using
 jsPDF" is a design decision — it belongs in the discussion the greenfield
-clause of ARC1 requires, not here.
+clause of your architecture rules requires, not here.
 
 ---
 

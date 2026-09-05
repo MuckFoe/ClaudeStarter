@@ -12,3 +12,6 @@ desktop.ini
 # Note: input/ is tracked here because it ships with its README. In a project
 # that *uses* this kit, consider ignoring input/ if the documents you drop in
 # are not meant to be committed.
+
+# Claude Code local overrides — never shared
+.claude/settings.local.json
