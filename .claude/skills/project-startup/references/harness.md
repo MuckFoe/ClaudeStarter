@@ -47,6 +47,13 @@ what exists rather than what is complete, so it never blocks a half-finished
 run, and it exits 2 with the specific failure on stderr so the agent can fix it
 without the user relaying anything.
 
+**Write hook commands and their matching `allow` permission with
+`${CLAUDE_PROJECT_DIR}`, never a bare relative path.** A relative path resolves
+against whatever the tool's actual invocation directory turns out to be, which
+is not guaranteed to be the project root — a known source of hooks and
+permissions that silently stop matching. `${CLAUDE_PROJECT_DIR}` is fixed at
+session start regardless.
+
 Useful events: `PreToolUse` to block an action before it happens, `PostToolUse`
 to check the result of one, `Stop` to gate the end of a turn. A `Stop` hook is
 the deterministic version of "verify your work" — Claude Code overrides it after
@@ -78,7 +85,7 @@ a permission list that was not worth writing.
 The `verification` domain established what proves the project still works. Make
 that runnable and record it:
 
-- Put the exact command in the `CLAUDE.md` command table.
+- Put the exact command in the `AGENTS.md` command table.
 - If the user wants the agent blocked from ending a turn while it fails, that is
   a `Stop` hook.
 - If it cannot yet run — no tests, no build — say so plainly and record a
@@ -111,14 +118,14 @@ pure overhead.
 **CLI tools first.** They are the most context-efficient way to reach an
 external service, and the agent already knows the common ones. Ask what services
 this project touches — GitHub, a cloud provider, an error tracker, a database —
-and record the CLI and any auth prerequisite in `CLAUDE.md` bindings. `gh` in
+and record the CLI and any auth prerequisite in `AGENTS.md` bindings. `gh` in
 particular is worth naming: without it, GitHub work falls back to unauthenticated
 API calls that hit rate limits mid-task.
 
 **MCP servers where no CLI exists**, or where the data is structured enough that
 parsing CLI output is the wrong shape — an issue tracker, a design tool, a
 database the agent should query directly. Record the server in `.mcp.json` so
-the team gets it, and note in `CLAUDE.md` what it is for.
+the team gets it, and note in `AGENTS.md` what it is for.
 
 Ask before adding either: an MCP server the user has not authorised is a
 dependency and a trust decision, not a convenience.

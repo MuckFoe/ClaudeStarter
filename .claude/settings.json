@@ -13,7 +13,7 @@
       "Bash(wc:*)",
       "Bash(find:*)",
       "Bash(rg:*)",
-      "Bash(node .claude/hooks/check-ruleset.mjs)"
+      "Bash(node ${CLAUDE_PROJECT_DIR}/.claude/hooks/check-ruleset.mjs)"
     ],
     "ask": [
       "Bash(git commit:*)",
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/check-ruleset.mjs"
+            "command": "node ${CLAUDE_PROJECT_DIR}/.claude/hooks/check-ruleset.mjs"
           }
         ]
       }

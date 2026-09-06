@@ -1,8 +1,9 @@
 # Building requirements
 
-Runs after the business background is settled with the user, and before any
-rules are proposed. Rules govern *how* work is done; requirements say *what*
-is to be built. Without them, commit traceability has nothing to point at.
+Runs in Phase 4, after the business background is settled with the user and
+before any rules are proposed. Rules govern *how* work is done; requirements
+say *what* is to be built. Without them, commit traceability has nothing to
+point at.
 
 Inputs: `input/_analysis.md`, and the user's answers to its Questions section.
 Output: `REQUIREMENTS.md`.

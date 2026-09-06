@@ -1,14 +1,15 @@
 ---
 name: project-startup
-description: Interactively build a project's agent ruleset and harness — a lean CLAUDE.md router, portable domain rule files, permissions, hooks and subagents — by proposing every rule one at a time and getting explicit approval before anything is written. Can ingest existing knowledge files (style guides, ADRs, READMEs, notes) and convert them into candidate rules.
+description: Interactively build a project's agent ruleset and harness — a lean AGENTS.md router (with a thin CLAUDE.md entry point), portable domain rule files, permissions, hooks and subagents — by proposing every rule one at a time and getting explicit approval before anything is written. Can ingest existing knowledge files (style guides, ADRs, READMEs, notes) and convert them into candidate rules. Ends by turning REQUIREMENTS.md into a sequenced ProjectPlan.md that the companion /project-build skill executes.
 disable-model-invocation: true
 ---
 
 # Project Startup
 
-Build the ruleset that governs agent work in this repository, then wire the
-harness that makes part of it hold deterministically. Nothing is written to
-disk until the user has approved it, rule by rule.
+Build the ruleset that governs agent work in this repository, wire the harness
+that makes part of it hold deterministically, then turn what the user wants
+built into a sequenced `ProjectPlan.md`. Nothing is written to disk until the
+user has approved it, rule by rule.
 
 ## Two hard constraints
 
@@ -80,7 +81,7 @@ Ask it for:
 - Language, framework, build system, test runner, package manifests
 - Directory structure and where the real boundaries are
 - Existing config: linters, formatters, CI, docker, editorconfig
-- Any existing `.claude/` setup, `CLAUDE.md`, or `.mcp.json`
+- Any existing `.claude/` setup, `CLAUDE.md`, `AGENTS.md`, or `.mcp.json`
 
 Ask for a **findings summary, not rules**, and require that it report what it
 could *not* determine — those gaps are where rules are most needed.
@@ -125,10 +126,15 @@ indistinguishable from one the user specified the moment it is written down.
 
 ### Phase 5 — Domain selection
 
-Present the candidate domains from `references/rule-catalog.md` with a one-line
-statement of what each would govern and why you think it applies *here*, citing
-what you found in Phase 1. The user picks which domains to work through and in
-what order.
+**Propose the `baseline` domain first, in every run**, before any project-
+specific domain. Its rules are pre-drafted in `references/rule-catalog.md`
+rather than found in Phase 1 — say that plainly when you introduce it, so the
+user knows why these arrive without a citation.
+
+Then present the remaining candidate domains from `references/rule-catalog.md`
+with a one-line statement of what each would govern and why you think it
+applies *here*, citing what you found in Phase 1. The user picks which of
+those to work through and in what order.
 
 Do not propose a domain you found no evidence for unless the user's stated
 stage makes it obviously relevant. Fewer, sharper domains beat complete coverage.
@@ -140,7 +146,11 @@ once the first domain closes is too late, because the reset does not wait.
 
 ### Phase 6 — Rule elicitation, one at a time
 
-For each selected domain, propose rules individually in this format:
+For `baseline`, present each pre-drafted rule from `references/rule-catalog.md`
+essentially as written — its `Evidence` line reads `universal default`, not a
+citation. Everything else about this phase still applies: one at a time, a
+real verdict each, edits welcome. For every other domain, propose rules
+individually in this format:
 
 ```
 RULE  <domain>/<n>
@@ -206,16 +216,25 @@ Only after a domain's rules are all resolved:
 2. Get one final confirmation.
 3. Write it, using the templates in `references/templates.md`.
 
-`CLAUDE.md` is a **router**, not a container. It holds only what applies to every
-session — identity, commands, and a table pointing at domain rule files with the
-trigger for reading each. Domain knowledge lives in `rules/<domain>.md` and loads
-on demand.
+`AGENTS.md` is the **router**, not a container. It holds only what applies to
+every session — identity, commands, and a table pointing at domain rule files
+with the trigger for reading each. Domain knowledge lives in `rules/<domain>.md`
+and loads on demand. Writing it as `AGENTS.md` rather than `CLAUDE.md` is what
+lets the same router work, unmodified, in any other AGENTS.md-aware tool
+(Cursor, Copilot, Codex, and others) someone points at this repo later.
+
+`CLAUDE.md` itself stays a thin entry point: `@AGENTS.md` and nothing else,
+unless something is genuinely Claude-Code-specific. Claude Code reads
+`CLAUDE.md`, not `AGENTS.md`, at session start — without that import line the
+router never loads for a Claude Code session at all.
 
 Do not use `@path` import syntax for domain rules. Imports load eagerly at
 session start, which reintroduces exactly the context bloat the split avoids.
-Reference the path in prose so it is read only when its trigger fires.
+Reference the path in prose so it is read only when its trigger fires. The
+`@AGENTS.md` import in `CLAUDE.md` is the one deliberate exception — it imports
+the router itself, not a domain file, and is what makes the router load at all.
 
-Keep `CLAUDE.md` under 200 lines. If it grows past that, something belongs in a
+Keep `AGENTS.md` under 200 lines. If it grows past that, something belongs in a
 rule file.
 
 ### Phase 8 — Wire the harness
@@ -249,13 +268,31 @@ correctness, portability, and invented content as real; treat the rest as
 optional and say so. Chasing every finding produces an over-built ruleset, which
 fails the same way an over-specified `CLAUDE.md` does.
 
-Then close the run:
+Then:
 
 - Confirm the ruleset check passes: `node .claude/hooks/check-ruleset.mjs`
 - Summarise what exists now, and what is still open in `_progress.md`
-- **Tell the user to `/clear` before implementing anything.** This session holds
-  the entire interview; implementation wants a clean context and the written
-  spec. The files are the handoff — that is what they were for.
+- Ask the user whether they want to stop here with the ruleset, or continue
+  straight into Phase 11. Either is a complete, valid place to end the run.
+
+### Phase 11 — Goals and the project plan
+
+Follow `references/planning.md`. The ruleset is settled and the user has said
+they don't want to add any more rules — this phase asks the one question that
+couldn't be asked before that was true: has anything about what you want built
+changed or come into focus, now that the ruleset exists?
+
+Reconcile any new or changed goal into `REQUIREMENTS.md` with the same
+clarity-bar discipline as Phase 4, one item at a time. Then sequence the open
+requirements into `ProjectPlan.md`, using the shape in `references/templates.md`
+— get the user's verdict on the order before writing it.
+
+Close by telling the user that `/project-build` is the companion skill that
+does the actual building: it resumes from `ProjectPlan.md` and takes one item
+at a time through plan → offer solution → build → verify → finish, and it can
+be run again in later sessions for the next item. **Tell the user to `/clear`
+before running it** — the build loop wants a clean context holding the
+ruleset and the plan, not this interview.
 
 ## Resuming a paused run
 
@@ -269,15 +306,23 @@ Keep `_progress.md` current as each domain closes.
 
 ## Re-running on an existing ruleset
 
-If `CLAUDE.md` or `rules/` already exist, read them and `_decisions.md` first.
-Then work only on gaps and on rules the user flags as stale. Never silently
-rewrite an existing approved rule — propose the change as its own rule with the
-old text shown alongside.
+If `AGENTS.md`, `CLAUDE.md`, or `rules/` already exist, read them and
+`_decisions.md` first. Then work only on gaps and on rules the user flags as
+stale. Never silently rewrite an existing approved rule — propose the change as
+its own rule with the old text shown alongside.
+
+If `AGENTS.md` exists but was not written by this skill — another tool put it
+there, or the project adopted the convention independently — treat it as
+existing input, not a blank slate: read it before proposing anything, and
+reconcile rather than overwrite. Its content is a stated fact about the project
+the same way an input document is; folding it in silently and rewriting over it
+is exactly the inference constraint 2 forbids.
 
 ## References
 
 - `references/ingestion.md` — reading `input/` without inferring anything (Phase 1)
 - `references/requirements.md` — the clarity bar and how to ask about what is unclear (Phase 4)
-- `references/rule-catalog.md` — candidate domains and the questions that surface real rules (Phase 5)
-- `references/templates.md` — exact file shapes for CLAUDE.md, rule files, and the logs (Phases 3, 5, 7)
+- `references/rule-catalog.md` — candidate domains, the baseline defaults, and the questions that surface real rules (Phase 5, Phase 6)
+- `references/templates.md` — exact file shapes for AGENTS.md, CLAUDE.md, rule files, and the logs (Phases 3, 4, 5, 7, 11)
 - `references/harness.md` — permissions, hooks, subagents, MCP (Phase 8)
+- `references/planning.md` — reconciling goals and sequencing `ProjectPlan.md` (Phase 11)

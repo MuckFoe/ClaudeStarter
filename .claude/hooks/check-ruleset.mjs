@@ -12,6 +12,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const CLAUDE_MD = 'CLAUDE.md';
+const AGENTS_MD = 'AGENTS.md';
 const RULES_DIR = 'rules';
 const MAX_LINES = 200;
 
@@ -19,13 +20,20 @@ const fail = [];
 
 if (!existsSync(CLAUDE_MD)) process.exit(0); // no ruleset yet
 
-const md = readFileSync(CLAUDE_MD, 'utf8');
+// The router is AGENTS.md once one exists — portable to any AGENTS.md-aware
+// tool, not just Claude Code. Fall back to CLAUDE.md itself for a ruleset
+// written before this split existed, or for this kit's own meta CLAUDE.md,
+// which has no rules/ directory and trips none of the checks below anyway.
+const hasAgentsMd = existsSync(AGENTS_MD);
+const ROUTER = hasAgentsMd ? AGENTS_MD : CLAUDE_MD;
+
+const md = readFileSync(ROUTER, 'utf8');
 const lines = md.split(/\r?\n/);
 
 // 1. Router stays a router.
 if (lines.length > MAX_LINES) {
   fail.push(
-    `${CLAUDE_MD} is ${lines.length} lines (cap ${MAX_LINES}). ` +
+    `${ROUTER} is ${lines.length} lines (cap ${MAX_LINES}). ` +
       `Move domain content into rules/<domain>.md and cite it instead.`
   );
 }
@@ -35,7 +43,7 @@ for (const [i, line] of lines.entries()) {
   const m = line.match(/@\.?\/?rules\/[\w.-]+\.md/);
   if (m) {
     fail.push(
-      `${CLAUDE_MD}:${i + 1} imports \`${m[0]}\` eagerly. ` +
+      `${ROUTER}:${i + 1} imports \`${m[0]}\` eagerly. ` +
         `Reference the path in prose so it loads when its trigger fires.`
     );
   }
@@ -45,7 +53,19 @@ for (const [i, line] of lines.entries()) {
 const cited = [...md.matchAll(/(?<!@)\b(rules\/[\w.-]+\.md)\b/g)].map((m) => m[1]);
 for (const path of [...new Set(cited)]) {
   if (!existsSync(path)) {
-    fail.push(`${CLAUDE_MD} points at \`${path}\`, which does not exist.`);
+    fail.push(`${ROUTER} points at \`${path}\`, which does not exist.`);
+  }
+}
+
+// 3b. Claude Code reads CLAUDE.md, not AGENTS.md — if AGENTS.md exists, CLAUDE.md
+// must import it, or the router never actually loads in a Claude Code session.
+if (hasAgentsMd) {
+  const claudeMd = readFileSync(CLAUDE_MD, 'utf8');
+  if (!/@\.?\/?AGENTS\.md\b/.test(claudeMd)) {
+    fail.push(
+      `${AGENTS_MD} exists but ${CLAUDE_MD} does not import it (\`@AGENTS.md\`). ` +
+        `Claude Code reads CLAUDE.md, not AGENTS.md, so without the import the router never loads.`
+    );
   }
 }
 

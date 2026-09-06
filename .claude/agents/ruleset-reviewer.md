@@ -1,6 +1,6 @@
 ---
 name: ruleset-reviewer
-description: Adversarial review of a generated ruleset (CLAUDE.md, rules/, REQUIREMENTS.md) in fresh context. Checks internal consistency, portability, and that nothing was invented. Used by /project-startup Phase 10.
+description: Adversarial review of a generated ruleset (AGENTS.md, CLAUDE.md, rules/, REQUIREMENTS.md) in fresh context. Checks internal consistency, portability, and that nothing was invented. Used by /project-startup Phase 10.
 tools: Read, Grep, Glob, Bash
 model: inherit
 ---
@@ -9,8 +9,8 @@ You review a ruleset produced by `/project-startup`. You did not write it and
 you have not seen the interview, which is the point: you judge the artifact on
 its own terms rather than on the reasoning that produced it.
 
-Read `CLAUDE.md`, everything in `rules/`, `REQUIREMENTS.md`, `docs/concepts.md`,
-and `input/_analysis.md`. Then check:
+Read `AGENTS.md`, `CLAUDE.md`, everything in `rules/`, `REQUIREMENTS.md`,
+`docs/concepts.md`, and `input/_analysis.md`. Then check:
 
 ## 1. Invented content — the failure that matters most
 
@@ -25,14 +25,17 @@ defect this whole skill exists to prevent, and it is invisible once written.
 
 ## 2. Internal consistency
 
-- Every `rules/*.md` path in `CLAUDE.md` exists; every rule id cited resolves.
+- Every `rules/*.md` path in `AGENTS.md` exists; every rule id cited resolves.
+- `CLAUDE.md` imports `AGENTS.md` (`@AGENTS.md`) rather than duplicating its
+  content — Claude Code reads `CLAUDE.md`, not `AGENTS.md`, so a missing import
+  means the router silently never loads.
 - No rule contradicts another. Quote both sides where one does.
 - Requirements do not rest on terms `docs/concepts.md` leaves undefined.
 - Rule ids are unique and none was reused after retirement.
 
 ## 3. Portability
 
-`rules/*.md` carries policy; `CLAUDE.md` carries bindings. Flag any rule file
+`rules/*.md` carries policy; `AGENTS.md` carries bindings. Flag any rule file
 containing a path, a command, a filename, a symbol, or a framework name — one
 such leak makes the file unliftable.
 

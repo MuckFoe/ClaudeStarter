@@ -1,8 +1,8 @@
 # File templates
 
-Exact shapes for the files this skill writes (Phases 3, 5 and 7). Adapt wording
-to the project; keep the structure and the two rules below, which are what make
-the output reusable.
+Exact shapes for the files this skill writes (Phases 3, 4, 5, 7 and 11). Adapt
+wording to the project; keep the structure and the two rules below, which are
+what make the output reusable.
 
 ---
 
@@ -47,10 +47,13 @@ that, the classification has gone soft.
 
 ---
 
-## `CLAUDE.md` — the router
+## `AGENTS.md` — the router
 
-Loaded on **every** session, so it pays rent on every turn. Identity, commands,
-citations, routing, bindings. Nothing else. Under 200 lines.
+Loaded on every session by any AGENTS.md-aware tool, so it pays rent on every
+turn. Identity, commands, citations, routing, bindings. Nothing else. Under 200
+lines. This is the actual router — see `CLAUDE.md` below for the one line that
+makes a Claude Code session reach it, since Claude Code reads `CLAUDE.md`, not
+`AGENTS.md`, at session start.
 
 ```markdown
 # <Project name>
@@ -106,6 +109,33 @@ this session, and the exact verification command with its last result.
 session start, which reintroduces exactly the context cost the split avoids.
 Reference paths in prose and in the routing table so files are read when their
 trigger fires.
+
+---
+
+## `CLAUDE.md` — the entry point
+
+Claude Code reads `CLAUDE.md`, not `AGENTS.md`, at session start — no other
+AGENTS.md-aware tool needs this file at all. To keep the router itself portable
+to those other tools without a Claude-specific copy drifting out of sync,
+`CLAUDE.md` stays a thin pointer instead of holding router content directly:
+
+```markdown
+# <Project name>
+
+@AGENTS.md
+```
+
+That single import is the whole file for most projects. Add a
+`## Claude Code specifics` section below it only for something genuinely
+tool-specific that would be noise in `AGENTS.md` for a tool that has no concept
+of it — a subagent to reach for, a hook's existence, an MCP server. Most
+projects need nothing here; an empty section is worse than an omitted one,
+since it invites filling in something that belongs in `AGENTS.md` instead.
+
+A symlink (`ln -s AGENTS.md CLAUDE.md`) is the alternative Claude Code's own
+docs describe for this interop, but creating one needs admin or developer mode
+on Windows — the import form is the one that works everywhere the kit gets
+pasted.
 
 ---
 
@@ -175,6 +205,45 @@ design.>
 
 **Out of scope** for the project as a whole gets its own section at the end and
 is confirmed explicitly. Unstated scope boundaries are where projects grow.
+
+---
+
+## `ProjectPlan.md`
+
+Written in Phase 11, after the ruleset is settled. Full protocol in
+`references/planning.md`. Sequences `REQUIREMENTS.md` into build-ready order
+for `/project-build` — it does not replace `REQUIREMENTS.md`, it schedules it.
+Every item cites the requirement it builds toward; an item with no requirement
+id is a task that has not been justified yet.
+
+```markdown
+# Project plan
+
+Built from REQUIREMENTS.md after the ruleset was settled. Read `_decisions.md`
+and `rules/_progress.md` before adding to this — do not replan around
+something already closed.
+
+Ids are stable and never reused after retirement.
+
+## P<n> — <short title>
+**Builds:** <requirement id(s) this item completes, in whole or in part>
+<What this step does. Small enough to plan, build, and verify in one pass.>
+
+**Status:** not started | planning | solution offered | building | verifying | done
+**Plan:** <filled in when planning starts — files/approach, named unknowns>
+**Solution:** <the approach offered for approval, once there is one>
+**Verify:** <the command run and its result, once there is one>
+**Finished:** <date, and the commit or diff it landed in>
+```
+
+**Sizing.** An item is one pass through plan → offer solution → build →
+verify → finish. If a requirement needs three such passes, it is three items,
+each citing the same requirement id — do not write one oversized item because
+the requirement was one line.
+
+**Order matters.** Sequence for dependency first (an item another item's
+solution depends on comes first), then for risk (the item most likely to
+change the plan for later items comes early, not last).
 
 ---
 

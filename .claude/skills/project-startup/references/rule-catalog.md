@@ -1,11 +1,110 @@
 # Rule catalog
 
-Candidate domains. These are **elicitation prompts, not a rule library** — never
-paste one of these as a finished rule. Use them to find what is actually true in
-this project, then propose a rule in the project's own terms with evidence.
+Read during Phase 5 (domain selection) and Phase 6 (elicitation).
 
-Order below is roughly the order worth working through: what the project is,
-then how to verify it, then everything else.
+Every domain here except `baseline` is an **elicitation prompt, not a rule
+library** — never paste one of these as a finished rule. Use them to find what
+is actually true in this project, then propose a rule in the project's own
+terms with evidence. `baseline` is the one exception: its entries are
+pre-drafted rule text, confirmed rather than elicited — see why at the top of
+that section.
+
+Order below is roughly the order worth working through: the baseline defaults
+first, then what the project is, then how to verify it, then everything else.
+
+---
+
+## `baseline` — universal defaults, confirmed not elicited
+
+Always proposed first, in every run. These do not need Phase 1 evidence to
+justify — they hold regardless of what this particular project turns out to
+be, which is exactly why they can be drafted in advance instead of elicited.
+"Confirmed" does not mean "rubber-stamped": each still gets its own verdict
+under the same five dispositions as every other rule, using this text as the
+starting proposal instead of a blank one. An **edit** here usually means
+narrowing scope or sharpening the wording for this project, not disagreeing
+with the substance.
+
+They deliberately do not duplicate the project-specific domains below:
+`verification` still elicits *which command* proves this project works,
+`agent-conduct` still elicits *which specific actions* need confirmation here.
+Baseline states the behavior that holds no matter what those answers turn out
+to be.
+
+```
+RULE  baseline/1
+─────────────────────────────────────────────
+Statement   Show evidence for claimed completion — command run and its
+            output, a diff, a screenshot — rather than asserting a task is
+            done.
+Why         Without a runnable check, "looks done" is the only signal
+            available, and it is not reliable. Evidence is also what makes an
+            unattended or reviewed-later session auditable.
+Evidence    universal default
+Tier        rule-file (raise to hook if a Stop-tier check exists — Phase 8)
+If wrong    Costs nothing to state; costs a false "done" to skip.
+```
+
+```
+RULE  baseline/2
+─────────────────────────────────────────────
+Statement   Confirm before an action that is hard to reverse or touches
+            shared state — force-push, resetting or discarding uncommitted
+            work, deleting branches or files, a migration — even when a
+            broader permission already allows the underlying command.
+Why         The cost of pausing to confirm is low. The cost of an unwanted
+            irreversible action, or one visible to people other than the
+            user, can be very high.
+Evidence    universal default
+Tier        hook where the action is scriptable (a PreToolUse check), else
+            advisory
+If wrong    An unnecessary confirmation is friction; a missing one is
+            sometimes unrecoverable.
+```
+
+```
+RULE  baseline/3
+─────────────────────────────────────────────
+Statement   Where this ruleset or the user's instructions do not state
+            something, ask or record it as unknown — never fill the gap from
+            general knowledge, convention, or what seems likely.
+Why         An inferred fact and a stated one are indistinguishable once
+            acted on. A wrong assumption compounds silently; a recorded
+            unknown gets asked about.
+Evidence    universal default
+Tier        advisory — this is a reasoning discipline, not a checkable action
+If wrong    A wrong invented fact is worse than a missing one, because a
+            missing one is visibly missing.
+```
+
+```
+RULE  baseline/4
+─────────────────────────────────────────────
+Statement   Treat this ruleset like code: when a rule stops changing
+            behavior, or a review shows it is not being read, prune it rather
+            than leaving it to accumulate.
+Why         An overlong or stale ruleset does not fail gracefully — it gets
+            ignored in whole, including the parts that still matter.
+Evidence    universal default
+Tier        advisory
+If wrong    Skipping this is how every ruleset becomes the over-specified
+            CLAUDE.md this rule exists to prevent.
+```
+
+```
+RULE  baseline/5
+─────────────────────────────────────────────
+Statement   Scope investigation narrowly to what the current task needs.
+            Push open-ended "read everything and figure it out" work into a
+            subagent instead of filling the primary context with it.
+Why         Context is the scarcest resource in a session, and degradation
+            from a full context is gradual and easy to miss until it has
+            already caused a mistake.
+Evidence    universal default
+Tier        advisory
+If wrong    Skipping this is how a session runs out of usable context before
+            the actual task is done.
+```
 
 ---
 
